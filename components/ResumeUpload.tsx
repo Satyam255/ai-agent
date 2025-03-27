@@ -21,6 +21,7 @@ export default function ResumeUpload() {
         if (e.target?.result) {
           const text = e.target.result.toString();
           const parsedData: ResumeData = parseResume(text);
+          console.log("Parsed Resume Data:", parsedData);
           setResumeData(parsedData);
         }
       };
@@ -34,11 +35,20 @@ export default function ResumeUpload() {
 
   const handleSubmit = () => {
     if (resumeData) {
-      const updatedCandidates = [...rankedCandidates, resumeData];
-      const ranked = rankCandidates(updatedCandidates);
-      setRankedCandidates(ranked);
-      localStorage.setItem("candidates", JSON.stringify(ranked));
-      alert("Resume submitted successfully!");
+      const isDuplicate = rankedCandidates.some(
+        (candidate) => candidate.email === resumeData.email
+      );
+
+      if (!isDuplicate) {
+        const updatedCandidates = [...rankedCandidates, resumeData];
+        const ranked = rankCandidates(updatedCandidates);
+        setRankedCandidates(ranked);
+        localStorage.setItem("candidates", JSON.stringify(ranked));
+        console.log("Updated Ranked Candidates:", ranked);
+        alert("Resume submitted successfully!");
+      } else {
+        alert("This resume has already been submitted.");
+      }
     }
   };
 
@@ -71,7 +81,7 @@ export default function ResumeUpload() {
       <h2 className="mt-4 font-semibold">Ranked Candidates:</h2>
       <ul className="bg-gray-100 p-2 rounded">
         {rankedCandidates.map((candidate, index) => (
-          <li key={index} className="border-b py-2">
+          <li key={index} className="border-b py-2 text-black">
             {candidate.name} - {candidate.skills.length} skills
           </li>
         ))}
